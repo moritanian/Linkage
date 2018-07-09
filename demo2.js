@@ -72,7 +72,7 @@ $(function(){
 	var rotational2 = new Linkage.Constraints.Rotational(point2, point3, point4);
 
 	var rotational3 = new Linkage.Constraints.Rotational(point4, point6, point7);
-	var rotational4 = new Linkage.Constraints.Rotational(point5, point6, point8);
+	var rotational4 = new Linkage.Constraints.Rotational(point5, point6, point9);
 
 	scene.addConstraint( rotational1 );
 	scene.addConstraint( rotational2 );

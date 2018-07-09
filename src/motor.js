@@ -2,6 +2,10 @@ function Motor( constraint ){
 
 	this.constraint = constraint;
 
+	constraint.isMotor = true;
+
+	constraint.motor = this;
+
 	this.speed = 0;
 
 	this.range = {};

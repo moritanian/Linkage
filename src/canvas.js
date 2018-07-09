@@ -67,6 +67,43 @@ Canvas.prototype.render = function(){
 					.lineTo( this.offset.x + p2.x * this.scale, this.offset.y - p2.y * this.scale );
 
 				break;
+
+			case "rotational":
+
+				var p1 = constraint.point1.position;
+				
+				var p2 = constraint.point2.position;
+				
+				var p3 = constraint.point3.position;
+
+				if( !constraint.graphics ){
+
+					constraint.graphics = new PIXI.Graphics();
+
+					if( constraint.isMotor){
+
+						constraint.graphics
+						.clear()
+						.lineStyle( 2, 0xfFFFF00 )
+						.arc( 0, 0, 20, constraint.motor.range.min, constraint.motor.range.max );
+					
+					} else {
+
+						constraint.graphics
+							.lineStyle( 2, 0xfFFFFFF )
+							.arc( 0, 0, 40 * Math.random() + 15, 0, constraint.actual );
+					}
+
+					this.app.stage.addChild ( constraint.graphics );
+
+				}
+				
+				constraint.graphics.x = this.offset.x + p2.x * this.scale;
+
+				constraint.graphics.y = this.offset.y - p2.y * this.scale;
+
+				constraint.graphics.rotation = - p3.clone().sub( p2 ).angle();
+				
 		} 
 
 	});
@@ -134,10 +171,19 @@ Canvas.prototype.render = function(){
 		}
 
 		var p1 = point.position;
-
+/*
+		point.graphics
+			//.lineStyle(0)
+			.beginFill(color)
+				//.drawCircle( this.offset.x + p1.x * this.scale, this.offset.y - p1.y * this.scale, 5)
+			.drawCircle( this.offset.x + p1.x * this.scale, this.offset.y - p1.y * this.scale, 2)
+			.endFill();
+*/
 		point.graphics.x = this.offset.x + p1.x * this.scale;
 
 		point.graphics.y = this.offset.y - p1.y * this.scale;
+
+		
 
 	});
 	
