@@ -25,7 +25,7 @@ function Point( position, fixed ){
 }
 
 // TODO adjust hyper parameter alpha
-Point.prototype._applyForceVec = function( alpha = 0.5 ){
+Point.prototype._applyForceVec = function( alpha = 0.1 ){
 
 	if( this.fixed ){
 

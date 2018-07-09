@@ -1,4 +1,4 @@
-import Vector2 from "./Vector2.js";
+import Canvas from "./canvas.js";
 
 function Scene (){
 
@@ -8,53 +8,23 @@ function Scene (){
 
 	this.solveProcedure = [];
 
+	this.motors = [];
+
+	this.lastTime = (new Date).getTime();
+
 }
 
 Scene.prototype.initCanvas = function( width = 800, height = 600){
 	
-	var app = new PIXI.Application(width, height, { antialias: true });
-	
-	this.domElement = app.view;
+	this.canvas = new Canvas( this, width, height );
 
-	app.stage.interactive = true;
+	return this.canvas.domElement;
 
-	var g = new PIXI.Graphics();
-	
-	app.stage.addChild(g);
+};
 
-	function drawLine( p1, p2, color = 0xFFFFFF){
-		
-		var scale = 80.0;
+Scene.prototype.render = function( ){
 
-		
-		var offset = new Vector2( width/2, height/2 );
-		
-		g.lineStyle( 2, color )
-			.moveTo( offset.x + p1.x * scale, offset.y - p1.y * scale )
-			.lineTo( offset.x + p2.x * scale, offset.y - p2.y * scale );
-
-	}
-
-	this.render = function(){
-
-		g.clear();	
-
-		this.constraints.forEach( ( constraint ) => {
-
-			switch (constraint.type){
-
-				case "linear":
-
-					drawLine( constraint.point1.position, constraint.point2.position );
-
-					break;
-			} 
-
-		});
-
-	};
-
-	return this.domElement;
+	this.canvas.render();
 
 };
 
@@ -88,6 +58,12 @@ Scene.prototype.addPoint = function( point ){
 Scene.prototype.addConstraint = function( constraint ){
 
 	this.constraints.push( constraint );
+	
+};
+
+Scene.prototype.addMotor = function( motor ){
+
+	this.motors.push( motor );
 	
 };
 
@@ -135,14 +111,33 @@ Scene.prototype._clearForce = function(){
 		this.points[i]._forceVec.y = 0;
 
 	}
-}
 
-Scene.prototype.solve = function(){
+};
+
+Scene.prototype._updateMotors = function( deltaTime ){
+
+	this.motors.forEach( (motor) => {
+
+		motor.update( deltaTime );
+
+	});
+
+};
+
+Scene.prototype.solve = function( deltaTime = 0.01 ){
 
 	var minError = 0.01;
-	var maxIttr = 10;
+	var maxIttr = 200;
 
 	var error = 0;
+
+	var currentTime = (new Date).getTime() / 1000.0;
+
+	var deltaTime = currentTime - this.lastTime;
+
+	this._updateMotors( deltaTime );
+
+	this.lastTime = currentTime;
 
 	this._clearSettled();
 
@@ -158,6 +153,8 @@ Scene.prototype.solve = function(){
 
 			constraint._addForceVec();
 
+			error += constraint.error ;
+
 			count ++;
 
 		});
@@ -165,8 +162,9 @@ Scene.prototype.solve = function(){
 
 		this.points.forEach( ( point ) => {
 
-			if( !point.fixed )
-				error += point._forceVec.lengthSq();
+			//if( !point.fixed )
+			//	error += point.diff;
+				//error += point._forceVec.lengthSq();
 
 			point._applyForceVec();
 			
@@ -182,11 +180,20 @@ Scene.prototype.solve = function(){
 
 		if( i == maxIttr - 1) {
 
-			console.warn( "Linkage.Scene.solve: cannot solved ");
+			console.warn( `Linkage.Scene.solve: cannot solved. Error = ${error} `);
 		
 		}
 
 	}
+
+};
+
+Scene.prototype.serialize = function(){
+
+};
+
+Scene.prototype.deserialize = function(){
+
 
 };
 

@@ -47,7 +47,7 @@ function ConstraintBase ( ){
 			
 			get: ()=> {
 
-				return this.diff * this.diff;
+				return this._computeError();
 			
 			}
 
@@ -91,6 +91,14 @@ ConstraintBase.prototype._computeDiff = function(  ){
 	}
 
 	return this._target - actual;
+
+};
+
+ConstraintBase.prototype._computeError = function( ){
+
+	var diff = this.diff;
+
+	return diff * diff;
 
 };
 
@@ -223,6 +231,7 @@ Linear.prototype.adjust = (function(){
 	var changeValue = 0;
 
 	var centerPos = new Vector2();
+
 	var tempVec= new Vector2();
 
 	function adjust(){
@@ -360,7 +369,7 @@ Rotational.prototype._clampAngle = function( angle, min ){
 
 	if( angle < min){
 
-		angle += Math.floor( (min - angle) / ( Math.PI * 2.0 ) ) * ( Math.PI * 2.0 + 1.0 );
+		angle += (Math.floor( (min - angle) / ( Math.PI * 2.0 ) ) + 1.0) * ( Math.PI * 2.0 );
 
 	} else {
 
@@ -372,22 +381,30 @@ Rotational.prototype._clampAngle = function( angle, min ){
 
 };
 
-Rotational.prototype._updateActual = function(  ){
+Rotational.prototype._updateActual = (function(){
 	
-	var angle1 = this.point3.position.clone().sub( this.point2.position ).angle();
+	var tempVec = new Vector2();
 
-	var angle2 = this.point2.position.clone().sub( this.point1.position ).angle();
+	function _updateActual(){
+
+		var angle1 = tempVec.subVectors( this.point3.position, this.point2.position ).angle();
+		
+		var angle2 = tempVec.subVectors( this.point1.position, this.point2.position ).angle();
+
+		var angle = angle1 - angle2;
+
+		// validation
+		angle = this._clampAngle( angle, this.range ? this.range.negativeLowLimit : 0);
+
+		this._actual = angle;
+		
+		return angle;
 	
-	var angle = angle1 - angle2;
+	}
 
-	// validation
-	angle = this._clampAngle( angle, this.range ? this.range.negativeLowLimit : 0);
+	return _updateActual;
 
-	this._actual = angle;
-	
-	return angle;
-
-};
+})();
 
 Rotational.prototype._computeDiff= function( ){
 
@@ -414,6 +431,32 @@ Rotational.prototype._computeDiff= function( ){
 	return diff;
 
 };
+
+Rotational.prototype._computeError = (function( ){
+
+	var tempVec = new Vector2();
+
+	function _computeError(){
+
+		var error = 0;
+
+		var diff = this.diff;
+
+		error +=  tempVec
+			.subVectors( this.point1.position, this.point2.position)
+			.lengthSq() * (diff * diff / 4.0)
+
+		error +=  tempVec
+			.subVectors( this.point3.position, this.point2.position)
+			.lengthSq() * (diff * diff / 4.0)
+
+		
+		return error;
+	}
+
+	return _computeError;
+
+})();
 
 // p2 force
 Rotational.prototype._computeSpringForce = (function (){
