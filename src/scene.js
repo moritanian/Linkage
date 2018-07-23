@@ -1,4 +1,6 @@
 import Canvas from "./canvas.js";
+import SpringSolver from "./spring-solver.js";
+import TriangleSolver from "./triangle-solver.js";
 
 function Scene (){
 
@@ -11,6 +13,12 @@ function Scene (){
 	this.motors = [];
 
 	this.lastTime = (new Date).getTime();
+
+	this.running = false;
+
+	this.triangleSolver = new TriangleSolver( this );
+
+	this.springSolver = new SpringSolver( this );
 
 }
 
@@ -64,31 +72,6 @@ Scene.prototype.addConstraint = function( constraint ){
 Scene.prototype.addMotor = function( motor ){
 
 	this.motors.push( motor );
-	
-};
-
-// calculate solveProcedure
-Scene.prototype.build = function(){
-
-	// clear
-	this.solveProcedure = []
-
-	this._clearSettled();
-
-	var dof = this.dof();
-
-	if( dof > 0){
-
-		console.warn( `Dof in this scene is ${dof} > 0. Cannot solve!!` );
-		
-		return;
-
-	}
-
-	// TODO : compute procedure
-
-	// clear
-	this._clearSettled();
 
 };
 
@@ -126,72 +109,31 @@ Scene.prototype._updateMotors = function( deltaTime ){
 
 Scene.prototype.solve = function( deltaTime = 0.01 ){
 
-	var minError = 0.01;
-	var maxIttr = 200;
-
-	var error = 0;
-
 	var currentTime = (new Date).getTime() / 1000.0;
 
 	var deltaTime = currentTime - this.lastTime;
 
-	this._updateMotors( deltaTime );
+	if( this.running ){
+	
+		this._updateMotors( deltaTime );
+
+	}
 
 	this.lastTime = currentTime;
 
 	this._clearSettled();
 
-	var count = 0;
-
-	for( var i=0; i<maxIttr; i++){
-
-		error = 0;
-
-		this._clearForce();
-
-		this.constraints.forEach(( constraint )=>{
-
-			constraint._addForceVec();
-
-			error += constraint.error ;
-
-			count ++;
-
-		});
-
-
-		this.points.forEach( ( point ) => {
-
-			//if( !point.fixed )
-			//	error += point.diff;
-				//error += point._forceVec.lengthSq();
-
-			point._applyForceVec();
-			
-			count ++;
-
-		});
-
-		if( error < minError ){
-
-			break;
-
-		}
-
-		if( i == maxIttr - 1) {
-
-			console.warn( `Linkage.Scene.solve: cannot solved. Error = ${error} `);
-		
-		}
-
-	}
+	//this.springSolver.solve();
+	this.triangleSolver.solve();
 
 };
 
+// TODO
 Scene.prototype.serialize = function(){
 
 };
 
+// TODO
 Scene.prototype.deserialize = function(){
 
 

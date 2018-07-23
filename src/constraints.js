@@ -10,6 +10,10 @@ function ConstraintBase ( ){
 
 	this._springK = 1.0;
 
+	this.range = {};
+
+	this.rangeLimit = false;
+
 	Object.defineProperties( this, {
 
 		target: {
@@ -122,6 +126,40 @@ ConstraintBase.prototype.getDof = function(){
 
 };
 
+ConstraintBase.prototype.getPointList  = function( ){
+
+	return [];
+
+};
+
+ConstraintBase.prototype._isOtherPointsSettled = function( point ){
+
+	var pointList = this.getPointList();
+
+	var result = true;
+
+	for ( var i = 0; i < pointList.length; i++){
+
+		if (pointList[i] === point){
+
+			continue;
+
+		}
+
+		if ( !pointList[i]._settled ){
+
+			result = false;
+
+			break;
+		
+		}
+
+	}
+
+	return result;
+
+};
+
 function Linear ( point1, point2, range ){
 
 	ConstraintBase.call( this );
@@ -136,8 +174,6 @@ function Linear ( point1, point2, range ){
 
 	this._updateActual();
 
-	this.rangeLimit = false;
-
 	if ( !!range ){
 		
 		this.rangeLimit = true;
@@ -150,6 +186,7 @@ function Linear ( point1, point2, range ){
 	} else {
 
 		this.setTarget( this._actual );
+
 	}
 
 
@@ -171,12 +208,6 @@ Linear.prototype = Object.assign(
 Linear.prototype.setTarget = function( target ){
 
 	this._target = target;
-
-	if( !this.range ){
-
-		this.range = {};
-	
-	}
 
 	this.range.min = target;
 
@@ -224,6 +255,16 @@ Linear.prototype._addForceVec = (function (){
 	return _addForceVec;
 
 })();
+
+Linear.prototype.getPointList  = function( ){
+
+	return [
+		this.point1,
+		this.point2
+	];
+
+};
+
 
 // donot use anymore
 Linear.prototype.adjust = (function(){
@@ -298,9 +339,6 @@ Linear.prototype.adjust = (function(){
 
 	this._updateActual();
 
-	this.rangeLimit = false;
-
-
 	if( !!range ){
 
 		this.rangeLimit = true;
@@ -312,7 +350,7 @@ Linear.prototype.adjust = (function(){
 	} else {
 
 		this.setTarget( this._actual );
-	
+
 	}
 
 	this._springK = 1.0;
@@ -340,12 +378,6 @@ Rotational.prototype.setTarget = function( target ){
 	target = this._clampAngle( target , 0);
 
 	this._target = target;
-
-	if( !this.range ){
-
-		this.range = {};
-	
-	}
 
 	this.range.min = target;
 
@@ -389,12 +421,12 @@ Rotational.prototype._updateActual = (function(){
 
 		var angle1 = tempVec.subVectors( this.point3.position, this.point2.position ).angle();
 		
-		var angle2 = tempVec.subVectors( this.point1.position, this.point2.position ).angle();
+		var angle2 = tempVec.subVectors( this.point2.position, this.point1.position ).angle();
 
 		var angle = angle1 - angle2;
 
 		// validation
-		angle = this._clampAngle( angle, this.range ? this.range.negativeLowLimit : 0);
+		//angle = this._clampAngle( angle, this.rangeLimit ? this.range.negativeLowLimit : 0);
 
 		this._actual = angle;
 		
@@ -449,7 +481,6 @@ Rotational.prototype._computeError = (function( ){
 		error +=  tempVec
 			.subVectors( this.point3.position, this.point2.position)
 			.lengthSq() * (diff * diff / 4.0)
-
 		
 		return error;
 	}
@@ -518,7 +549,21 @@ Rotational.prototype._addForceVec = (function (){
 
 })();
 
+Rotational.prototype.getPointList  = function( ){
+
+	return [
+		this.point1,
+		this.point2,
+		this.point3
+	];
+
+};
+
+export default {Linear, Rotational}
+/*
 export default {
 	Linear : Linear,
 	Rotational : Rotational
 }
+
+*/

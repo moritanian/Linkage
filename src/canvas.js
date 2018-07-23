@@ -18,7 +18,6 @@ function Canvas( scene, width, height){
 		
 	this.offset = new Vector2( this.width/2, this.height/2 );
 		
-
 }
 
 Canvas.prototype.drawLine = function( p1, p2, color = 0xFFFFFF){
@@ -85,13 +84,13 @@ Canvas.prototype.render = function(){
 						constraint.graphics
 						.clear()
 						.lineStyle( 2, 0xfFFFF00 )
-						.arc( 0, 0, 20, constraint.motor.range.min, constraint.motor.range.max );
+						.arc( 0, 0, 20, - constraint.motor.range.max, - constraint.motor.range.min );
 					
 					} else {
 
 						constraint.graphics
 							.lineStyle( 2, 0xfFFFFFF )
-							.arc( 0, 0, 40 * Math.random() + 15, 0, constraint.actual );
+							.arc( 0, 0, 40 * Math.random() + 15, 0, constraint.actual - Math.PI);
 					}
 
 					this.app.stage.addChild ( constraint.graphics );
@@ -103,6 +102,7 @@ Canvas.prototype.render = function(){
 				constraint.graphics.y = this.offset.y - p2.y * this.scale;
 
 				constraint.graphics.rotation = - p3.clone().sub( p2 ).angle();
+				//constraint.graphics.rotation = - p2.clone().sub( p1 ).angle();
 				
 		} 
 

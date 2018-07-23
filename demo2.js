@@ -93,6 +93,7 @@ $(function(){
 	console.log( `dof is ${scene.getDof()}`);
 
 	//scene.build();
+	scene.triangleSolver.build( scene );
 
 	var $button = $("#start-stop");
 	var state = "start";
@@ -100,20 +101,17 @@ $(function(){
 	$button.click(()=>{
 		state = state === "start" ? "stop" : "start";
 		$button.text( state );
+		scene.running = state === "stop";
 	});	
 
-	motor.move( Math.PI / 5, {min: Math.PI / 5, max: Math.PI * 0.65});
+	$button.click();
+
+	motor.move( Math.PI / 5, {min: Math.PI * 6 / 5, max: Math.PI * 8 / 5});
 	//motor.move( Math.PI / 5, {min: 0, max: Math.PI/200});
 
 	function animate(){
 
 		requestAnimationFrame( animate );
-
-		if( state === "stop"){
-
-			return;
-
-		}
 
 		scene.solve();
 

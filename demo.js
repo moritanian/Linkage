@@ -39,6 +39,8 @@ $(function(){
 	console.log( `dof is ${scene.getDof()}`);
 
 	//scene.build();
+	scene.triangleSolver.build( scene );
+	
 
 	var $button = $("#start-stop");
 	var state = "start";
