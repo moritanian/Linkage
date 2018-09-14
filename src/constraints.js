@@ -266,59 +266,6 @@ Linear.prototype.getPointList  = function( ){
 };
 
 
-// donot use anymore
-Linear.prototype.adjust = (function(){
-
-	var changeValue = 0;
-
-	var centerPos = new Vector2();
-
-	var tempVec= new Vector2();
-
-	function adjust(){
-
-		var unsettledPoints = [];
-
-		if( this.point1._settled ){
-
-			unsettledPoints.add( this.point1 );
-
-		}
-
-		if( this.point2._settled ){
-
-			unsettledPoints.add( this.point2 );
-			
-		}
-
-		if( unsettledPoints.length == 0 || this.diff == 0 ){
-
-			return changeValue;
-
-		}
-
-		changeValue = this.error / unsettledPoints.length;
-
-		var moveValue = this.diff / unsettledPoints.length;
-
-		var distance = this._actual;
-
-		centerPos.lerpVectors( this.point1.position, this.point2.position, 0.5 );
-
-		unsettledPoints.forEach( ( point ) => {
-
-			point.position.lerp( centerPos, moveValue * 2.0 / distance );
-
-		});
-
-		return changeValue;
-
-	}
-
-	return adjust;
-
-})();
-
 /*
 	range{
 		min : 0 ~ 2pi
@@ -560,10 +507,3 @@ Rotational.prototype.getPointList  = function( ){
 };
 
 export default {Linear, Rotational}
-/*
-export default {
-	Linear : Linear,
-	Rotational : Rotational
-}
-
-*/
