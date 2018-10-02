@@ -60,6 +60,10 @@ function SpringSolver(scene){
 		}
 	}
 
+	this.build = function(){
+		// nothing to do
+	};
+
 }
 
 export default SpringSolver;

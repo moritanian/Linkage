@@ -4,7 +4,7 @@ $(function(){
 
 
 	// create snew cene
-	var scene = new Linkage.Scene();
+	var scene = new Linkage.Scene( Linkage.TriangleSolver ) ;
 
 	var dom = scene.initCanvas();
 
@@ -92,8 +92,7 @@ $(function(){
 
 	console.log( `dof is ${scene.getDof()}`);
 
-	//scene.build();
-	scene.triangleSolver.build( scene );
+	scene.solver.build( scene );
 
 	var $button = $("#start-stop");
 	var state = "start";

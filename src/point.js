@@ -1,6 +1,18 @@
 import Vector2 from "./Vector2.js";
 
-function Point( position, fixed ){
+function Point( name, position, fixed ){
+
+	if( typeof name == 'string'){
+	
+		this.name = name;
+	
+	}else {
+
+		fixed = position;
+
+		position = name;
+
+	}
 
 	if( position === undefined ){
 	

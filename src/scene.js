@@ -2,7 +2,9 @@ import Canvas from "./canvas.js";
 import SpringSolver from "./spring-solver.js";
 import TriangleSolver from "./triangle-solver.js";
 
-function Scene (){
+let defauleSolver = SpringSolver;
+
+function Scene (solver){
 
 	this.points = [];
 
@@ -16,9 +18,15 @@ function Scene (){
 
 	this.running = false;
 
-	this.triangleSolver = new TriangleSolver( this );
+	if( !solver ){
 
-	this.springSolver = new SpringSolver( this );
+		solver = defauleSolver;
+	
+	} 
+
+	console.log(`Scene: use ${solver.name}` );
+	
+	this.solver = new solver( this );
 
 }
 
@@ -123,8 +131,7 @@ Scene.prototype.solve = function( deltaTime = 0.01 ){
 
 	this._clearSettled();
 
-	//this.springSolver.solve();
-	this.triangleSolver.solve();
+	this.solver.solve();
 
 };
 

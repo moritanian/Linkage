@@ -159,7 +159,12 @@ Canvas.prototype.render = function(){
 			    }
 			}
 
+			function onClick(){
+				console.log(point.name);
+			}
+
 			point.graphics
+				.on('click', onClick)
 		        .on('pointerdown', onDragStart)
 		        .on('pointerup', onDragEnd)
 		        .on('pointerupoutside', onDragEnd)
