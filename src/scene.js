@@ -33,9 +33,9 @@ function Scene (solver){
 
 }
 
-Scene.prototype.initCanvas = function( width = innerWidth, height = innerHeight){
+Scene.prototype.initCanvas = function( width = innerWidth, height = innerHeight, scale = 50.0){
 
-	this.canvas = new Canvas( this, width, height );
+	this.canvas = new Canvas( this, width, height, scale );
 
 	return this.canvas.domElement;
 
@@ -182,6 +182,12 @@ Scene.prototype.setGravity = function( useGravity, gravityVec = null ){
 	this.gravityVec = gravityVec || new Vector2(0, 1).multiplyScalar( g );
 console.log(this.gravityVec)
 };
+
+Scene.prototype.clear = function(){
+
+	this.points = [];
+	this.motors = [];
+}
 
 // TODO
 Scene.prototype.serialize = function(){

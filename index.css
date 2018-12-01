@@ -7,3 +7,52 @@ body {
 	height: 25px;
 
 }
+
+#control-panel {
+	position: absolute;
+	right: 0;
+	padding: 10px;
+	margin: 4px;
+    background-color: #212121;
+    box-shadow: 3px 2px 13px 1px #828282;
+    width: 240px;
+}
+
+#control-panel {
+	position: absolute;
+    color: white;
+    right: 0px;
+    padding: 10px;
+    background-color: #212121;
+    margin: 10px;
+}
+
+#title-text {
+	font-weight: bold;
+    padding: 4px;
+}
+
+
+#demo-list {
+	margin: 2px 0px 10px;
+}
+
+.demo-button {
+	text-align: center;
+    background-color: #504f50;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-bottom: 2px;
+}
+
+.demo-button.active {
+	background-color: #000e27;
+}
+
+.demo-button:hover {
+	background-color: #1e84cc;
+}
+
+.demo-button:active {
+	background-color: #496579;
+}

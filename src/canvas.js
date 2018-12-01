@@ -1,6 +1,6 @@
 import Vector2 from "./Vector2.js";
 
-function Canvas( scene, width, height){
+function Canvas( scene, width, height, scale){
 		
 	this.scene = scene;
 
@@ -9,12 +9,16 @@ function Canvas( scene, width, height){
 	this.height = height;
 
 	this.app = new PIXI.Application(width, height, { antialias: true });
+
+	console.log(this.app);
+
+	this.app.renderer.backgroundColor = 0x101010;
 	
 	this.domElement = this.app.view;
 
 //	this.app.stage.interactive = true;
 
-	this.scale = 1000.0;
+	this.scale = scale;
 		
 	this.offset = new Vector2( this.width/2, this.height/2 );
 		

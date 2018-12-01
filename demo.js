@@ -1,74 +1,48 @@
-import Linkage from "./src/linkage.js";
+import SpringSolverDemo from "./spring-solver-demo.js"
+import GeometricSolverDemo from "./geometric-solver-demo.js"
+import DynamicSolverDemo from "./dynamic-solver-demo.js"
 
 $(function(){	
 
+	var demos = [
+		new SpringSolverDemo(),
+		new GeometricSolverDemo(),
+		new DynamicSolverDemo()
+	];
 
-	// create snew cene
-	var scene = new Linkage.Scene();
+	const activeClass = "active";
 
-	var dom = scene.initCanvas();
+	var currentDemo = null;
 
-	document.body.appendChild(dom);
+	demos.forEach( (demo)=> {
 
-	// create points
-	var point0 = new Linkage.Point( [-2,0], /* fixed =  */ true);
-	var point1 = new Linkage.Point( [0,0], /* fixed =  */ true);
-	var point2 = new Linkage.Point( [2,0] );
-	var point3 = new Linkage.Point( [0,2] );
+		let demoButton = $("<div>").addClass("demo-button").text(demo.name);
 
-	scene.addPoint( point0 );
-	scene.addPoint( point1 );
-	scene.addPoint( point2 );
-	scene.addPoint( point3 );
+		demo.button = demoButton;
 
-	// create constraint
-	var linear1 = new Linkage.Constraints.Linear( point2, point3 );
-	var linear2 = new Linkage.Constraints.Linear( point3, point1 );
-	var linear3 = new Linkage.Constraints.Linear( point1, point2 );
+		let targetDemo = demo;
 
-	scene.addConstraint( linear1 );
-	scene.addConstraint( linear2 );
-	scene.addConstraint( linear3 );
+		$("#demo-list").append(demoButton);
 
-	// constrol constraint
-	var control = new Linkage.Constraints.Rotational(point0, point1, point2);
-	//var control = new Linkage.Constraints.Linear(point1, point2);
+		demoButton.click(function(e){
 
-	scene.addConstraint( control );
+			if(currentDemo)
+				currentDemo.clear();
 
-	console.log( `dof is ${scene.getDof()}`);
+			$(".demo-button").removeClass(activeClass);
 
-	//scene.build();
-	scene.triangleSolver.build( scene );
+			$(this).addClass(activeClass);
+			
+			currentDemo = targetDemo;
+		
+			currentDemo.init();
+
+			currentDemo.animate();
+
+		});
 	
+	});
 
-	var $button = $("#start-stop");
-	var state = "start";
+	demos[0].button.click();
 
-	$button.click(()=>{
-		state = state === "start" ? "stop" : "start";
-		$button.text( state );
-	});	
-
-	function animate(){
-
-		requestAnimationFrame( animate );
-
-		if( state === "stop"){
-
-			return;
-
-		}
-
-		control.setTarget(  control.target + Math.PI/500.0 ) ;
-
-		//console.log( control.target / Math.PI * 180);
-
-		scene.solve();
-
-		scene.render();
-
-	}
-
-	animate();
 });
