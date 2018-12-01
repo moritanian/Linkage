@@ -160,11 +160,15 @@ ConstraintBase.prototype._isOtherPointsSettled = function( point ){
 
 };
 
+ConstraintBase.prototype.addForceVec = function(){
+
+	console.error("addForceVec shold be defined in overloaded class");
+
+};
+
 function Linear ( point1, point2, range ){
 
 	ConstraintBase.call( this );
-
-	Object.defineProperty
 
 	this.type = "linear";
 
@@ -226,7 +230,7 @@ Linear.prototype._updateActual = function(  ){
 };
 
 // p2 force
-Linear.prototype._computeSpringForce = function( forceVec1, forceVec2 ){
+Linear.prototype._computeForce = function( forceVec1, forceVec2 ){
 
 	forceVec1.subVectors( this.point1.position, this.point2.position ) .setLength( this.diff * this._springK);
 
@@ -238,21 +242,21 @@ Linear.prototype._computeSpringForce = function( forceVec1, forceVec2 ){
 
 };
 
-Linear.prototype._addForceVec = (function (){
+Linear.prototype.addForceVec = (function (){
 
 	var forceVec1 = new Vector2();
 	var forceVec2 = new Vector2();
 	
-	function _addForceVec(){
+	function addForceVec(){
 
-		this._computeSpringForce( forceVec1, forceVec2 );
+		this._computeForce( forceVec1, forceVec2 );
 
 		this.point1._forceVec.add( forceVec1 );
 		this.point2._forceVec.add( forceVec2 );
 
 	}
 
-	return _addForceVec;
+	return addForceVec;
 
 })();
 
@@ -437,31 +441,35 @@ Rotational.prototype._computeError = (function( ){
 })();
 
 // p2 force
-Rotational.prototype._computeSpringForce = (function (){
+Rotational.prototype._computeForce = (function (){
 	
-	var tempVec = new Vector2();
+	var tempVec1 = new Vector2();
+	var tempVec2 = new Vector2();
 
-	function _computeSpringForce( forceVec1, forceVec2, forceVec3 ){
+	function _computeForce( forceVec1, forceVec2, forceVec3 ){
 
 		var torque = this.diff * this._springK;
 
 		// point1
-		tempVec.subVectors( this.point2.position, this.point1.position );
+		tempVec1.subVectors( this.point2.position, this.point1.position );
+		tempVec2.subVectors( this.point3.position, this.point2.position );
 
-		forceVec1.x = - tempVec.y;
-		forceVec1.y = tempVec.x;
+		forceVec1.x = - tempVec1.y;
+		forceVec1.y = tempVec1.x;
 
 		//forceVec1.multiplyScalar( torque / tempVec.lengthSq() );
-		forceVec1.multiplyScalar( torque  );
+		//forceVec1.multiplyScalar( torque  );
+		forceVec1.multiplyScalar( torque * tempVec2.length() / tempVec1.length() );
 
 		// point3
-		tempVec.subVectors( this.point3.position, this.point2.position );
+		//tempVec.subVectors( this.point3.position, this.point2.position );
 
-		forceVec3.x = - tempVec.y;
-		forceVec3.y = tempVec.x;
+		forceVec3.x = - tempVec2.y;
+		forceVec3.y = tempVec2.x;
 
 		//forceVec3.multiplyScalar( torque / tempVec.lengthSq() );
-		forceVec3.multiplyScalar( torque  );
+		//forceVec3.multiplyScalar( torque  );
+		forceVec3.multiplyScalar( torque * tempVec1.length() / tempVec2.length() );
 
 		// point2
 		forceVec2.addVectors( forceVec1, forceVec3 ).negate();
@@ -472,19 +480,19 @@ Rotational.prototype._computeSpringForce = (function (){
 
 	}
 
-	return _computeSpringForce;
+	return _computeForce;
 
 })();
 
-Rotational.prototype._addForceVec = (function (){
+Rotational.prototype.addForceVec = (function (){
 
 	var forceVec1 = new Vector2();
 	var forceVec2 = new Vector2();
 	var forceVec3 = new Vector2();
 	
-	function _addForceVec(){
+	function addForceVec(){
 
-		this._computeSpringForce( forceVec1, forceVec2, forceVec3 );
+		this._computeForce( forceVec1, forceVec2, forceVec3 );
 
 		this.point1._forceVec.add( forceVec1 );
 		this.point2._forceVec.add( forceVec2 );
@@ -492,7 +500,7 @@ Rotational.prototype._addForceVec = (function (){
 
 	}
 
-	return _addForceVec;
+	return addForceVec;
 
 })();
 
@@ -506,4 +514,116 @@ Rotational.prototype.getPointList  = function( ){
 
 };
 
-export default {Linear, Rotational}
+function RotationalSpring( point1, point2, point3, springK = 2 ,range = null ){
+
+	ConstraintBase.call( this );
+
+	this.type = "rotational-spring";
+
+	this.point1 = point1;
+	
+	this.point2 = point2;
+	
+	this.point3 = point3;
+
+	this._updateActual();
+
+	if( !!range ){
+
+		this.rangeLimit = true;
+
+		this.range = range;
+
+		this._updateRange();
+
+	} else {
+
+		this.setTarget( this._actual );
+
+	}
+
+	this._springK = springK;
+
+	this.point1.constraints.push( this );
+
+	this.point2.constraints.push( this );
+	
+	this.point3.constraints.push( this );
+
+}
+
+RotationalSpring.prototype = Object.assign( 
+
+	Object.create( Rotational.prototype ), {
+
+		constructor : RotationalSpring
+		
+	}
+
+);
+
+// spring has no error 
+RotationalSpring.prototype._computeError = function(){
+
+	return 0;
+
+};
+
+function LinearDamper(point1, point2, dampFactor = 0.1){
+
+	ConstraintBase.call( this );
+
+	Object.defineProperty
+
+	this.type = "linear-damper";
+
+	this.point1 = point1;
+	
+	this.point2 = point2;
+
+	this.point1.constraints.push( this );
+
+	this.point2.constraints.push( this );
+
+	this.dampFactor = dampFactor;
+
+};
+
+LinearDamper.prototype = Object.assign( 
+
+	Object.create( Linear.prototype ), {
+
+		constructor : LinearDamper
+
+	}
+);
+
+let tempVec = new Vector2();
+
+LinearDamper.prototype._computeForce = function( forceVec1, forceVec2){
+
+	forceVec1.copy( this.point1.position )
+
+		.sub( this.point2.position );
+
+	let dot = tempVec.copy( this.point1.velocity )
+
+		.sub( this.point2.velocity )
+
+		.dot( forceVec1 );
+
+	forceVec1.multiplyScalar( - dot / forceVec1.lengthSq() * this.dampFactor )
+
+	forceVec2.copy( forceVec1 ).negate();
+/*
+	forceVec1.x = 0;
+	forceVec2.x = 0;
+	forceVec1.y = 0;
+	forceVec2.y = 0;
+*/
+	return [forceVec1, forceVec2];
+
+};
+ 
+
+export default {Linear, Rotational, RotationalSpring, LinearDamper}

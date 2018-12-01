@@ -4,7 +4,8 @@ $(function(){
 
 
 	// create snew cene
-	var scene = new Linkage.Scene( Linkage.TriangleSolver ) ;
+	//var scene = new Linkage.Scene( Linkage.TriangleSolver ) ;
+	var scene = new Linkage.Scene( ) ;
 
 	var dom = scene.initCanvas();
 

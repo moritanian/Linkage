@@ -1,6 +1,7 @@
 import Canvas from "./canvas.js";
 import SpringSolver from "./spring-solver.js";
 import TriangleSolver from "./triangle-solver.js";
+import Vector2 from "./Vector2.js";
 
 let defauleSolver = SpringSolver;
 
@@ -14,7 +15,7 @@ function Scene (solver){
 
 	this.motors = [];
 
-	this.lastTime = (new Date).getTime();
+	this.lastTime = (new Date).getTime() / 1000.0;
 
 	this.running = false;
 
@@ -28,10 +29,12 @@ function Scene (solver){
 	
 	this.solver = new solver( this );
 
+	this.useGravity = false;
+
 }
 
-Scene.prototype.initCanvas = function( width = 800, height = 600){
-	
+Scene.prototype.initCanvas = function( width = innerWidth, height = innerHeight){
+
 	this.canvas = new Canvas( this, width, height );
 
 	return this.canvas.domElement;
@@ -94,7 +97,7 @@ Scene.prototype._clearSettled = function(){
 
 };
 
-Scene.prototype._clearForce = function(){
+Scene.prototype.clearForce = function(){
 
 	for( var i in this.points){
 
@@ -115,7 +118,7 @@ Scene.prototype._updateMotors = function( deltaTime ){
 
 };
 
-Scene.prototype.solve = function( deltaTime = 0.01 ){
+Scene.prototype.solve = function(){
 
 	var currentTime = (new Date).getTime() / 1000.0;
 
@@ -133,6 +136,51 @@ Scene.prototype.solve = function( deltaTime = 0.01 ){
 
 	this.solver.solve();
 
+};
+
+Scene.prototype.update = function(divideNum = 300){
+
+	var currentTime = (new Date).getTime() / 1000.0;
+
+	var deltaTime = currentTime - this.lastTime;
+
+	if( deltaTime > 0.1 ){
+		deltaTime = 0.1;
+	}
+
+	if( this.running ){
+	
+		this._updateMotors( deltaTime );
+
+	}
+
+	this.lastTime = currentTime;
+
+	this._clearSettled();
+
+
+	for( var i = 0; i < divideNum; i++){
+
+		this.solver.simulate( deltaTime / divideNum);
+
+	}
+
+};
+
+Scene.prototype.setGravity = function( useGravity, gravityVec = null ){
+
+	this.useGravity = !! useGravity;
+
+	if( !useGravity ){
+
+		return;
+
+	}
+
+	const g = -9.8; // m/s^2
+
+	this.gravityVec = gravityVec || new Vector2(0, 1).multiplyScalar( g );
+console.log(this.gravityVec)
 };
 
 // TODO

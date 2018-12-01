@@ -5,6 +5,9 @@ import Constraints from "./constraints.js";
 import Motor from "./motor.js";
 import SpringSolver from "./spring-solver.js";
 import TriangleSolver from "./triangle-solver.js";
+import DynamicSolver from "./dynamic-solver.js";
+
+import Unit from "./unit.js";
 
 var Linkage = {
 	Scene: Scene,
@@ -12,7 +15,9 @@ var Linkage = {
 	Constraints: Constraints,
 	Motor: Motor,
 	SpringSolver: SpringSolver,
-	TriangleSolver, TriangleSolver 
+	TriangleSolver, TriangleSolver,
+	DynamicSolver, DynamicSolver,
+	Unit: Unit
 };
 
 export default Linkage;

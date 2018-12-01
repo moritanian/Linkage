@@ -14,7 +14,7 @@ function Canvas( scene, width, height){
 
 //	this.app.stage.interactive = true;
 
-	this.scale = 50.0;
+	this.scale = 1000.0;
 		
 	this.offset = new Vector2( this.width/2, this.height/2 );
 		
@@ -68,6 +68,7 @@ Canvas.prototype.render = function(){
 				break;
 
 			case "rotational":
+			case "rotational-spring":
 
 				var p1 = constraint.point1.position;
 				
@@ -89,8 +90,8 @@ Canvas.prototype.render = function(){
 					} else {
 
 						constraint.graphics
-							.lineStyle( 2, 0xfFFFFFF )
-							.arc( 0, 0, 40 * Math.random() + 15, 0, constraint.actual - Math.PI);
+							.lineStyle( 2, constraint.type == "rotational" ? 0xfFFFFFF : 0xFFCCCC)
+							.arc( 0, 0, 35, 0, constraint.actual - Math.PI);
 					}
 
 					this.app.stage.addChild ( constraint.graphics );
