@@ -14,7 +14,9 @@ $(function(){
 
 	var currentDemo = null;
 
-	demos.forEach( (demo)=> {
+	for (let i=0; i<demos.length; i++) {
+
+		let demo = demos[i];
 
 		let demoButton = $("<div>").addClass("demo-button").text(demo.name);
 
@@ -25,6 +27,8 @@ $(function(){
 		$("#demo-list").append(demoButton);
 
 		demoButton.click(function(e){
+		
+			location.hash = `demo${i+1}`
 
 			if(currentDemo)
 				currentDemo.clear();
@@ -41,8 +45,17 @@ $(function(){
 
 		});
 	
-	});
+	}
 
-	demos[0].button.click();
+	var locationHash = location.hash.match(/\#demo[1-3]/);
+
+	var demoNum = 1;
+	
+	if(locationHash){
+		var s = locationHash.toString();
+		demoNum = s[s.length-1];
+	}
+	
+	demos[demoNum -1].button.click();
 
 });
