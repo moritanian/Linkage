@@ -2,7 +2,7 @@
 crank link simulator
 
 <p align="center">
-  <a href="https://moritanian.github.io/Linkage.js#demo1/"><img src="https://moritanian.github.io/Linkage.js/images/demo1.png"/></a>
+  <a href="https://moritanian.github.io/Linkage.js#demo1"><img src="https://moritanian.github.io/Linkage.js/images/demo1.png"/></a>
   <a href="https://moritanian.github.io/Linkage.js#demo3"><img src="https://moritanian.github.io/Linkage.js/images/demo2.png"/></a>
 </p>
 
@@ -11,7 +11,13 @@ crank link simulator
 
 ## Solver
 ### Linkage.SpringSolver
+build a spring model and compute equilibrium condition
 
+### Linkage.TriangleSolver
+solve geometrically 
+
+### Linkage.DynamicSolver
+simulate mechanically with verlet method
 
 ## Usage
 ```demo.js
