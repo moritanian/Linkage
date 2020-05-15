@@ -1,0 +1,29 @@
+{
+  "name": "linkage-simulator",
+  "version": "0.5.0",
+  "description": "Crank and link simulator",
+  "main": "src/linkage.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moritanian/Linkage.git"
+  },
+  "keywords": [
+    "linkage",
+    "link",
+    "crank",
+    "simulator",
+    "javascript",
+    "js",
+    "2d",
+    "physics"
+  ],
+  "author": "Moritanian <pickit2express@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/moritanian/Linkage/issues"
+  },
+  "homepage": "https://github.com/moritanian/Linkage#readme"
+}
